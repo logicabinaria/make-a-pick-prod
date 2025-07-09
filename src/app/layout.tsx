@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   description: "A privacy-focused app to help you make random decisions from your custom options. Available in English and Bangla.",
   keywords: "decision maker, random picker, choice selector, privacy-focused",
   authors: [{ name: "Make a Pick" }],
+  other: {
+    "google-adsense-account": "ca-pub-6150853912343151",
+  },
 };
 
 export const viewport: Viewport = {
