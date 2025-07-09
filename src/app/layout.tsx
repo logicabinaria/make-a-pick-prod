@@ -50,6 +50,20 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-BQ0B5JQXSG"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-BQ0B5JQXSG');
+          `}
+        </Script>
+
         {/* Google AdSense - Only load if configured */}
         {ADSENSE_CONFIG.isConfigured && (
           <Script
