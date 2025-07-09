@@ -7,7 +7,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import PrivacyNotice from '@/components/PrivacyNotice';
 import Picker from '@/components/Picker';
 import StatsDisplay from '@/components/StatsDisplay';
-import AdBanner from '@/components/AdBanner';
+import FlexibleAdBanner from '@/components/FlexibleAdBanner';
 import SocialShare from '@/components/SocialShare';
 import MobileFooter from '@/components/MobileFooter';
 import MobileOptimizer from '@/components/MobileOptimizer';
@@ -58,7 +58,7 @@ function AppContent() {
         <Header />
         
         <main className="container mx-auto px-4 py-4 space-y-6 max-w-lg">
-            <AdBanner />
+            <FlexibleAdBanner />
             <Picker />
             <StatsDisplay />
             <SocialShare />

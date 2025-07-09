@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { ADSENSE_CONFIG } from "@/config/adsense";
+import { ADSENSE_CONFIG, EZOIC_CONFIG } from "@/config/ads";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -64,8 +64,43 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Google AdSense - Only load if configured */}
-        {ADSENSE_CONFIG.isConfigured && (
+        {/* Ezoic Privacy Scripts - Load first for GDPR compliance */}
+        {EZOIC_CONFIG.isActive && (
+          <>
+            {EZOIC_CONFIG.privacyScripts.map((src, index) => (
+              <Script
+                key={`ezoic-privacy-${index}`}
+                src={src}
+                strategy="beforeInteractive"
+                data-cfasync="false"
+              />
+            ))}
+          </>
+        )}
+        
+        {/* Ezoic Header Script */}
+        {EZOIC_CONFIG.isActive && (
+          <>
+            <Script
+              async
+              src={EZOIC_CONFIG.headerScript}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="ezoic-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.ezstandalone = window.ezstandalone || {};
+                  ezstandalone.cmd = ezstandalone.cmd || [];
+                `
+              }}
+            />
+          </>
+        )}
+
+        {/* Google AdSense - Only load if configured and active */}
+        {ADSENSE_CONFIG.isActive && (
           <Script
             async
             src={ADSENSE_CONFIG.scriptUrl}
