@@ -1,0 +1,28 @@
+{
+  "appName": "Make a Pick",
+  "tagline": "Decide in a Snap!",
+  "addOption": "Add Option",
+  "makeAPick": "Pick Now",
+  "enterOption": "Enter an option...",
+  "result": "Result",
+  "yourPick": "Your pick is:",
+  "tryAgain": "Try Again",
+  "newDecision": "New Decision",
+  "addMoreOptions": "Add at least 2 options to make a pick",
+  "languageSelector": {
+    "title": "Choose Your Language",
+    "description": "Please select your preferred language to continue.",
+    "english": "English",
+    "bangla": "বাংলা (Bangla)",
+    "continue": "Continue"
+  },
+  "privacyNotice": {
+    "title": "Privacy Notice",
+    "description": "This app is privacy-focused. We do not store your personal data or the options you enter. Your choices remain on your device only.",
+    "accept": "Accept and Continue"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "noOptions": "Please add at least 2 options."
+  }
+}
