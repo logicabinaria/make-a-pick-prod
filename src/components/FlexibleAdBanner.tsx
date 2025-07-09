@@ -5,10 +5,12 @@ import {
   ADSENSE_CONFIG, 
   EZOIC_CONFIG,
   MONETAG_CONFIG,
+  ADSTERRA_CONFIG,
   getAdProviderInfo, 
   initializeAdSense, 
   initializeEzoic,
-  initializeMonetag 
+  initializeMonetag,
+  initializeAdsterra 
 } from '@/config/ads';
 
 interface FlexibleAdBannerProps {
@@ -61,8 +63,15 @@ export default function FlexibleAdBanner({
         setAdLoaded(true);
       }, 500);
       return () => clearTimeout(timer);
+    } else if (adInfo.adsterraActive) {
+      // Initialize Adsterra
+      const timer = setTimeout(() => {
+        initializeAdsterra();
+        setAdLoaded(true);
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [adInfo.isEzoic, adInfo.adsenseActive, adInfo.monetagActive, finalPlacementId]);
+  }, [adInfo.isEzoic, adInfo.adsenseActive, adInfo.monetagActive, adInfo.adsterraActive, finalPlacementId]);
 
   // Don't render anything if no ad provider is active
   if (!adInfo.isActive) {
@@ -72,7 +81,7 @@ export default function FlexibleAdBanner({
   return (
     <div className={`w-full max-w-md mx-auto mt-6 ${className}`}>
       {/* Only show "Advertisement" label when ads are actually active */}
-      {(adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive) && (
+      {(adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive || adInfo.adsterraActive) && (
         <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
           Advertisement
         </div>
@@ -125,13 +134,36 @@ export default function FlexibleAdBanner({
         <>
           <div 
             id={MONETAG_CONFIG.placements[placementType].id}
-            className="min-h-[90px] max-h-[120px] flex items-center justify-center"
+            className="min-h-[90px] w-full flex items-center justify-center"
+            style={{ minHeight: '90px' }}
           >
+            {/* Monetag ads will be automatically injected here by their script */}
             {!adLoaded && (
               <div className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-center animate-pulse">
                 <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Loading Monetag ad...
+                </p>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+      
+      {/* Adsterra Ad */}
+      {adInfo.adsterraActive && (
+        <>
+          <div 
+            id={ADSTERRA_CONFIG.placements[placementType].id}
+            className="w-full flex items-center justify-center"
+            style={{ minHeight: `${ADSTERRA_CONFIG.height}px`, width: `${ADSTERRA_CONFIG.width}px`, maxWidth: '100%', margin: '0 auto' }}
+          >
+            {/* Adsterra ads will be automatically injected here by their script */}
+            {!adLoaded && (
+              <div className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-center animate-pulse">
+                <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Loading Adsterra ad...
                 </p>
               </div>
             )}
@@ -153,14 +185,16 @@ export default function FlexibleAdBanner({
       )}
       
       {/* Debug info in development - only show when ads are active */}
-      {process.env.NODE_ENV === 'development' && (adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive) && (
+      {process.env.NODE_ENV === 'development' && (adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive || adInfo.adsterraActive) && (
         <div className="mt-2 p-2 rounded text-xs bg-blue-50 dark:bg-blue-900/20">
           <strong>Ad Debug:</strong> Provider: {adInfo.provider} | 
           Ezoic: {adInfo.ezoicActive ? '✅' : '❌'} | 
           AdSense: {adInfo.adsenseActive ? '✅' : '❌'} | 
           Monetag: {adInfo.monetagActive ? '✅' : '❌'} |
+          Adsterra: {adInfo.adsterraActive ? '✅' : '❌'} |
           {adInfo.isEzoic && ` Placement: ${finalPlacementId} (${placementType})`}
           {adInfo.isMonetag && ` Placement: ${MONETAG_CONFIG.placements[placementType].id} (${placementType})`}
+          {adInfo.isAdsterra && ` Placement: ${ADSTERRA_CONFIG.placements[placementType].id} (${placementType}) | Key: ${ADSTERRA_CONFIG.key}`}
         </div>
       )}
     </div>

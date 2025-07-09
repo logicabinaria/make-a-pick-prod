@@ -1,11 +1,12 @@
 // Flexible Ad Configuration - Supports Ezoic and Google AdSense
 // Switch between ad providers by changing the AD_PROVIDER constant
 
-export type AdProvider = 'ezoic' | 'adsense' | 'monetag' | 'none';
+export type AdProvider = 'ezoic' | 'adsense' | 'monetag' | 'adsterra' | 'none';
 
-// Change this to switch between ad providers
-// Note: Change this value to switch between providers
-const AD_PROVIDER_SETTING: AdProvider = 'monetag'; // Options: 'ezoic', 'adsense', 'monetag', 'none'
+// Read ad provider from environment variables
+// Set NEXT_PUBLIC_AD_PROVIDER in .env.local to switch between providers
+// Options: 'ezoic', 'adsense', 'monetag', 'adsterra', 'none'
+const AD_PROVIDER_SETTING: AdProvider = (process.env.NEXT_PUBLIC_AD_PROVIDER as AdProvider) || 'none';
 export const AD_PROVIDER = AD_PROVIDER_SETTING;
 
 // Ezoic Configuration
@@ -19,12 +20,12 @@ export const EZOIC_CONFIG = {
   // Main Ezoic header script
   headerScript: '//www.ezojs.com/ezoic/sa.min.js',
   
-  // Ezoic ad placement IDs (configure these in your Ezoic dashboard)
+  // Ezoic ad placement IDs (configure these in your Ezoic dashboard or .env.local)
   placements: {
-    banner: 101,        // Main banner placement
-    sidebar: 102,       // Sidebar placement
-    footer: 103,        // Footer placement
-    inContent: 104      // In-content placement
+    banner: parseInt(process.env.NEXT_PUBLIC_EZOIC_PLACEMENT_BANNER || '101'),
+    sidebar: parseInt(process.env.NEXT_PUBLIC_EZOIC_PLACEMENT_SIDEBAR || '102'),
+    footer: parseInt(process.env.NEXT_PUBLIC_EZOIC_PLACEMENT_FOOTER || '103'),
+    inContent: parseInt(process.env.NEXT_PUBLIC_EZOIC_PLACEMENT_CONTENT || '104')
   },
   
   // Ezoic configuration options
@@ -39,14 +40,14 @@ export const EZOIC_CONFIG = {
   }
 };
 
-// Google AdSense Configuration (keeping existing setup)
+// Google AdSense Configuration
 export const ADSENSE_CONFIG = {
-  // Your Google AdSense Publisher ID (starts with ca-pub-)
-  publisherId: 'ca-pub-6150853912343151',
+  // Your Google AdSense Publisher ID (configure in .env.local)
+  publisherId: process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || 'ca-pub-XXXXXXXXXXXXXXXXX',
   
-  // Ad Slot ID for small banner ad in footer
+  // Ad Slot ID for small banner ad in footer (configure in .env.local)
   adSlots: {
-    banner: '1234567890', // Replace with your actual Banner ad slot ID from AdSense
+    banner: process.env.NEXT_PUBLIC_ADSENSE_BANNER_SLOT || '1234567890',
   },
   
   // AdSense script URL
@@ -70,8 +71,11 @@ export const ADSENSE_CONFIG = {
 
 // Monetag Configuration
 export const MONETAG_CONFIG = {
-  // Monetag verification meta tag content
-  metaContent: '4d9ab32e84c95f6a2550e62a49385baf',
+  // Monetag verification meta tag content (configure in .env.local)
+  metaContent: process.env.NEXT_PUBLIC_MONETAG_META_CONTENT || '',
+  
+  // Monetag ad URL (configure in .env.local)
+  adUrl: process.env.NEXT_PUBLIC_MONETAG_AD_URL || '',
   
   // Monetag ad placement configurations
   placements: {
@@ -99,7 +103,48 @@ export const MONETAG_CONFIG = {
   }
 };
 
-// Ezoic window interface
+// Adsterra Configuration
+export const ADSTERRA_CONFIG = {
+  // Adsterra ad configuration (configure in .env.local)
+  key: process.env.NEXT_PUBLIC_ADSTERRA_KEY || '88fb5a09f71069802bf883c6dc2a331e',
+  
+  // Ad format and dimensions
+  format: 'iframe',
+  height: 60,
+  width: 468,
+  
+  // Script URL template
+  get scriptUrl() {
+    return `//www.highperformanceformat.com/${this.key}/invoke.js`;
+  },
+  
+  // Ad placement configurations
+  placements: {
+    banner: {
+      id: 'adsterra-banner',
+      type: 'banner'
+    },
+    sidebar: {
+      id: 'adsterra-sidebar',
+      type: 'sidebar'
+    },
+    footer: {
+      id: 'adsterra-footer',
+      type: 'footer'
+    },
+    inContent: {
+      id: 'adsterra-content',
+      type: 'in-content'
+    }
+  },
+  
+  // Check if Adsterra is the selected provider
+  get isActive() {
+    return (AD_PROVIDER as string) === 'adsterra';
+  }
+};
+
+// Global window interface
 declare global {
   interface Window {
     ezstandalone: {
@@ -111,6 +156,13 @@ declare global {
       isEzoicUser?: (percentage: number) => boolean;
     };
     adsbygoogle: unknown[];
+    atOptions: {
+      key: string;
+      format: string;
+      height: number;
+      width: number;
+      params: Record<string, unknown>;
+    };
   }
 }
 
@@ -148,11 +200,47 @@ export const initializeAdSense = () => {
 export const initializeMonetag = () => {
   if (typeof window !== 'undefined' && MONETAG_CONFIG.isActive) {
     try {
-      // Monetag initialization logic will be added here
-      // Currently just a placeholder for future implementation
-      console.log('Monetag initialized');
+      // Create and load Monetag script
+      const script = document.createElement('script');
+      script.src = MONETAG_CONFIG.adUrl;
+      script.async = true;
+      script.setAttribute('data-cfasync', 'false');
+      
+      // Add script to document head
+      document.head.appendChild(script);
+      
+      console.log('Monetag script loaded:', MONETAG_CONFIG.adUrl);
     } catch (error) {
       console.error('Monetag initialization error:', error);
+    }
+  }
+};
+
+// Adsterra initialization helper
+export const initializeAdsterra = () => {
+  if (typeof window !== 'undefined' && ADSTERRA_CONFIG.isActive) {
+    try {
+      // Set Adsterra options
+      window.atOptions = {
+        key: ADSTERRA_CONFIG.key,
+        format: ADSTERRA_CONFIG.format,
+        height: ADSTERRA_CONFIG.height,
+        width: ADSTERRA_CONFIG.width,
+        params: {}
+      };
+      
+      // Create and load Adsterra script
+      const script = document.createElement('script');
+      script.src = ADSTERRA_CONFIG.scriptUrl;
+      script.async = true;
+      script.setAttribute('data-cfasync', 'false');
+      
+      // Add script to document head
+      document.head.appendChild(script);
+      
+      console.log('Adsterra script loaded:', ADSTERRA_CONFIG.scriptUrl);
+    } catch (error) {
+      console.error('Adsterra initialization error:', error);
     }
   }
 };
@@ -173,9 +261,11 @@ export const getAdProviderInfo = () => {
     isEzoic: (AD_PROVIDER as string) === 'ezoic',
     isAdSense: (AD_PROVIDER as string) === 'adsense',
     isMonetag: (AD_PROVIDER as string) === 'monetag',
+    isAdsterra: (AD_PROVIDER as string) === 'adsterra',
     isActive: (AD_PROVIDER as string) !== 'none',
     ezoicActive: EZOIC_CONFIG.isActive,
     adsenseActive: ADSENSE_CONFIG.isActive,
-    monetagActive: MONETAG_CONFIG.isActive
+    monetagActive: MONETAG_CONFIG.isActive,
+    adsterraActive: ADSTERRA_CONFIG.isActive
   };
 };
