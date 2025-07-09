@@ -8,7 +8,7 @@ import PrivacyNotice from '@/components/PrivacyNotice';
 import Picker from '@/components/Picker';
 import StatsDisplay from '@/components/StatsDisplay';
 import FlexibleAdBanner from '@/components/FlexibleAdBanner';
-import SocialShare from '@/components/SocialShare';
+
 import MobileFooter from '@/components/MobileFooter';
 import MobileOptimizer from '@/components/MobileOptimizer';
 import { getLanguagePreference, getPrivacyConsent } from '@/utils/storage';
@@ -58,10 +58,9 @@ function AppContent() {
         <Header />
         
         <main className="container mx-auto px-4 py-4 space-y-6 max-w-lg">
-            <FlexibleAdBanner />
             <Picker />
             <StatsDisplay />
-            <SocialShare />
+            <FlexibleAdBanner />
           </main>
 
         <MobileFooter />

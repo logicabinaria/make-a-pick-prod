@@ -21,12 +21,21 @@ interface I18nProviderProps {
 }
 
 const getNestedValue = (obj: Translations, path: string): string => {
-  return path.split('.').reduce((current: string | Translations | undefined, key) => {
+  const result = path.split('.').reduce((current: string | Translations | undefined, key) => {
     if (typeof current === 'object' && current !== null) {
       return current[key];
     }
     return current;
-  }, obj as string | Translations | undefined) as string || path;
+  }, obj as string | Translations | undefined);
+  
+  // If the result is an object, return the path as fallback
+  // This prevents rendering objects as React children
+  if (typeof result === 'object') {
+    console.warn(`Translation key '${path}' resolved to an object instead of a string`);
+    return path;
+  }
+  
+  return result as string || path;
 };
 
 export function I18nProvider({ children }: I18nProviderProps) {

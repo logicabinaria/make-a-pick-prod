@@ -72,7 +72,7 @@ export default function FlexibleAdBanner({
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [adInfo.isEzoic, adInfo.adsenseActive, adInfo.monetagActive, adInfo.adsterraActive, finalPlacementId]);
+  }, [adInfo.isEzoic, adInfo.adsenseActive, adInfo.monetagActive, adInfo.adsterraActive, finalPlacementId, placementType]);
 
   // Don't render anything if no ad provider is active
   if (!adInfo.isActive) {
