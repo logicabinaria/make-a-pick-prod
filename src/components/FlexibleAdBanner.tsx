@@ -66,7 +66,8 @@ export default function FlexibleAdBanner({
     } else if (adInfo.adsterraActive) {
       // Initialize Adsterra
       const timer = setTimeout(() => {
-        initializeAdsterra();
+        const containerId = ADSTERRA_CONFIG.placements[placementType].id;
+        initializeAdsterra(containerId);
         setAdLoaded(true);
       }, 500);
       return () => clearTimeout(timer);
@@ -152,23 +153,19 @@ export default function FlexibleAdBanner({
       
       {/* Adsterra Ad */}
       {adInfo.adsterraActive && (
-        <>
-          <div 
-            id={ADSTERRA_CONFIG.placements[placementType].id}
-            className="w-full flex items-center justify-center"
-            style={{ minHeight: `${ADSTERRA_CONFIG.height}px`, width: `${ADSTERRA_CONFIG.width}px`, maxWidth: '100%', margin: '0 auto' }}
-          >
-            {/* Adsterra ads will be automatically injected here by their script */}
-            {!adLoaded && (
-              <div className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-center animate-pulse">
-                <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Loading Adsterra ad...
-                </p>
-              </div>
-            )}
-          </div>
-        </>
+        <div 
+          id={ADSTERRA_CONFIG.placements[placementType].id}
+          className="w-full flex items-center justify-center"
+          style={{ 
+            minHeight: `${ADSTERRA_CONFIG.height}px`, 
+            width: `${ADSTERRA_CONFIG.width}px`, 
+            maxWidth: '100%', 
+            margin: '0 auto',
+            backgroundColor: 'transparent'
+          }}
+        >
+          {/* Adsterra ads will be automatically injected here by their script */}
+        </div>
       )}
       
       {/* Placeholder when no ad provider is active */}

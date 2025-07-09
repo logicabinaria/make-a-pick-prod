@@ -217,7 +217,7 @@ export const initializeMonetag = () => {
 };
 
 // Adsterra initialization helper
-export const initializeAdsterra = () => {
+export const initializeAdsterra = (containerId?: string) => {
   if (typeof window !== 'undefined' && ADSTERRA_CONFIG.isActive) {
     try {
       // Set Adsterra options
@@ -229,16 +229,31 @@ export const initializeAdsterra = () => {
         params: {}
       };
       
-      // Create and load Adsterra script
-      const script = document.createElement('script');
-      script.src = ADSTERRA_CONFIG.scriptUrl;
-      script.async = true;
-      script.setAttribute('data-cfasync', 'false');
+      // Find the target container
+      const container = containerId ? document.getElementById(containerId) : null;
       
-      // Add script to document head
-      document.head.appendChild(script);
-      
-      console.log('Adsterra script loaded:', ADSTERRA_CONFIG.scriptUrl);
+      if (container) {
+        // Create and load Adsterra script directly in the container
+        const script = document.createElement('script');
+        script.src = ADSTERRA_CONFIG.scriptUrl;
+        script.async = true;
+        script.setAttribute('data-cfasync', 'false');
+        
+        // Add script to the specific container
+        container.appendChild(script);
+        
+        console.log('Adsterra script loaded in container:', containerId, ADSTERRA_CONFIG.scriptUrl);
+      } else {
+        // Fallback: Add script to document head
+        const script = document.createElement('script');
+        script.src = ADSTERRA_CONFIG.scriptUrl;
+        script.async = true;
+        script.setAttribute('data-cfasync', 'false');
+        
+        document.head.appendChild(script);
+        
+        console.log('Adsterra script loaded in head:', ADSTERRA_CONFIG.scriptUrl);
+      }
     } catch (error) {
       console.error('Adsterra initialization error:', error);
     }
