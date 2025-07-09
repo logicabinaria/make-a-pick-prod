@@ -9,6 +9,9 @@
   "tryAgain": "Try Again",
   "newDecision": "New Decision",
   "addMoreOptions": "Add at least 2 options to make a pick",
+  "loading": "Loading...",
+  "picking": "Picking...",
+  "learnHowToPlay": "Click here to learn how to play",
   "languageSelector": {
     "title": "Choose Your Language",
     "description": "Please select your preferred language to continue.",
@@ -23,6 +26,96 @@
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
-    "noOptions": "Please add at least 2 options."
+    "noOptions": "Please add at least 2 options.",
+    "pickFailed": "Failed to make a pick"
+  },
+  "inspiringQuotes": {
+    "quote1": "Sometimes the best decisions are made with a little bit of chance! 🎲",
+    "quote2": "Trust the process - even random choices can lead to great outcomes! ✨",
+    "quote3": "Life is full of surprises, and so are your decisions! 🌟",
+    "quote4": "Every choice is a new adventure waiting to happen! 🚀",
+    "quote5": "The universe has spoken through randomness! 🌌",
+    "quote6": "Sometimes letting go of control leads to the best results! 🍃",
+    "quote7": "Your random pick might just be exactly what you needed! 💫",
+    "quote8": "Embrace the unexpected - it often leads to wonderful discoveries! 🎯",
+    "quote9": "Decision made! Now it's time to make the most of it! 💪",
+    "quote10": "Random doesn't mean wrong - it means open to possibilities! 🌈"
+  },
+  "help": {
+    "backToApp": "Back to App",
+    "title": "What is Make A Pick?",
+    "subtitle": "A simple, privacy-focused decision-making tool that helps you choose from multiple options randomly.",
+    "howItWorks": {
+      "title": "🎯 How It Works",
+      "step1": "Enter your options (at least 2)",
+      "step2": "Click \"Pick Now\" to make a random selection",
+      "step3": "Get your result instantly with a fun confetti animation!",
+      "step4": "Try again with the same options or start fresh"
+    },
+    "quickTips": {
+      "title": "⚡ Quick Tips",
+      "tip1": "to quickly add new options",
+      "tip2": "The app automatically focuses on new option fields",
+      "tip3": "Remove options you don't need with the × button",
+      "tip4": "All your data stays on your device - completely private!"
+    },
+    "privacy": {
+      "title": "🔒 Privacy First",
+      "description": "Your privacy matters to us. Here is what we do:",
+      "point1": "No data collection or tracking",
+      "point2": "Options are processed locally when possible",
+      "point3": "No account registration required",
+      "point4": "Works offline for basic functionality"
+    },
+    "perfectFor": {
+      "title": "🌍 Perfect For",
+      "daily": {
+        "title": "Daily Decisions",
+        "description": "Choosing what to eat, what to wear, or weekend activities"
+      },
+      "team": {
+        "title": "Team Activities",
+        "description": "Making quick team decisions and breaking ties in discussions"
+      },
+      "creative": {
+        "title": "Creative Projects",
+        "description": "Picking themes, colors, or creative directions for your projects"
+      },
+      "fun": {
+        "title": "Fun & Games",
+        "description": "Random selections for games, challenges, or entertainment"
+      }
+    },
+    "cta": {
+      "title": "Ready to Make Your Pick?",
+      "description": "Start making decisions faster and more fairly with our simple tool.",
+      "button": "🎯 Start Picking Now"
+    }
+  },
+  "disclaimer": {
+    "title": "Disclaimer",
+    "backToApp": "Back to App",
+    "warningTitle": "Important Notice",
+    "warningText": "This app is designed for entertainment and lighthearted decision-making only. Results are completely random and should not be considered as serious advice.",
+    "mainText": "Make a Pick is a fun tool designed to help you make random selections from your options. While it can be useful for simple choices like what to eat or which movie to watch, it should never be used for important life decisions.",
+    "doNotUseTitle": "Do NOT use this app for:",
+    "doNotUse": {
+      "health": "Health-related decisions or medical choices",
+      "relationships": "Relationship decisions or personal matters",
+      "financial": "Financial investments or money-related decisions",
+      "legal": "Legal matters or important contracts",
+      "critical": "Any critical life decisions that could impact your wellbeing"
+    },
+    "responsibilityTitle": "Your Responsibility",
+    "responsibilityText": "You are solely responsible for any actions you take based on the results from this app. Always use your own judgment and common sense when making decisions.",
+    "enjoyTitle": "Have Fun!",
+    "enjoyText": "This app is meant to be enjoyed! Use it for fun choices, breaking ties in casual discussions, or when you simply can't decide between equally good options.",
+    "linkText": "Disclaimer"
+  },
+  "socialShare": {
+    "title": "Love Make A Pick? Share it with friends!",
+    "subtitle": "Help others make quick decisions too",
+    "shareText": "Check out Make A Pick - a fun tool to help you make random decisions!",
+    "copyLink": "Copy Link"
   }
 }
