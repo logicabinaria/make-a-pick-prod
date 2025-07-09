@@ -5,6 +5,7 @@ import { useTranslation } from '@/components/I18nProvider';
 import confetti from 'canvas-confetti';
 import { pickRandomOption } from '@/utils/clientPicker';
 import { useMobile } from '@/hooks/useMobile';
+import Image from 'next/image';
 
 // Inspiring quotes function - Disabled for now to save screen space
 // const getInspiringQuotes = (t: (key: string) => string) => [
@@ -136,77 +137,81 @@ export default function Picker() {
 
   if (result) {
     return (
-      <div className="max-w-md mx-auto space-y-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center relative overflow-hidden">
-          {/* Neon border animation */}
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 opacity-75 blur-sm animate-pulse"></div>
-          <div className="absolute inset-[2px] rounded-lg bg-white dark:bg-gray-800"></div>
-          
-          <div className="relative z-10">
-            <div className="text-center space-y-8">
-              <div className="relative bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 text-white p-8 rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
-                <div className="absolute inset-0 bg-white/10 rounded-2xl backdrop-blur-sm"></div>
-                <div className="relative z-10">
-                  <div className="text-4xl mb-4">🎉</div>
-                  <h2 className="text-2xl font-bold mb-3">{t('result')}</h2>
-                  <p className="text-lg mb-4 opacity-90">{t('yourPick')}</p>
-                  <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
-                    <p className="text-3xl font-bold text-white drop-shadow-lg">{result}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={tryAgain}
-                  className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
-                >
-                  <svg className="w-5 h-5 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  {t('tryAgain')}
-                </button>
-                <button
-                  onClick={newDecision}
-                  className="group px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
-                >
-                  <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  {t('newDecision')}
-                </button>
-              </div>
-            </div>
+      <div className="max-w-md mx-auto space-y-8">
+        {/* Logo */}
+        <div className="text-center">
+          <div className="flex justify-center">
+            <Image
+              src="/logosvg.svg"
+              alt="Make A Pick - Random Decision Maker"
+              width={150}
+              height={80}
+              className="h-15 w-auto"
+              priority
+            />
           </div>
         </div>
         
-        {/* Inspiring Text - Hidden for now to save screen space, can be re-enabled in the future */}
-        {/* {inspiringText && (
-          <div className="bg-gradient-to-r from-green-50 to-orange-50 dark:from-green-900/20 dark:to-orange-900/20 rounded-lg p-4 text-center border border-green-200 dark:border-green-800">
-            <p className="text-green-800 dark:text-green-200 font-medium">
-              {inspiringText}
-            </p>
+        {/* Result Display */}
+        <div className="text-center space-y-8">
+          <div className="relative bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 text-white p-8 rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
+            <div className="absolute inset-0 bg-white/10 rounded-2xl backdrop-blur-sm"></div>
+            <div className="relative z-10">
+              <div className="text-4xl mb-4">🎉</div>
+              <h2 className="text-2xl font-bold mb-3">{t('result')}</h2>
+              <p className="text-lg mb-4 opacity-90">{t('yourPick')}</p>
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/30">
+                <p className="text-3xl font-bold text-white drop-shadow-lg">{result}</p>
+              </div>
+            </div>
           </div>
-        )} */}
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={tryAgain}
+              className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {t('tryAgain')}
+            </button>
+            <button
+              onClick={newDecision}
+              className="group px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              {t('newDecision')}
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg relative overflow-hidden">
-      {/* Neon border animation */}
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-75 blur-sm animate-pulse"></div>
-      <div className="absolute inset-[2px] rounded-lg bg-white dark:bg-gray-800"></div>
-      
-      <div className="relative z-10">
-        <div className="text-center space-y-4 mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            {t('appName')}
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 font-medium">
-            {t('tagline')}
-          </p>
+    <div className="max-w-md mx-auto space-y-8">
+      {/* Logo and Tagline */}
+      <div className="text-center space-y-6">
+        <div className="flex justify-center">
+          <Image
+            src="/logosvg.svg"
+            alt="Make A Pick - Random Decision Maker"
+            width={150}
+            height={80}
+            className="h-15 w-auto"
+            priority
+          />
         </div>
+        <p className="text-xl text-gray-300 font-medium">
+          {t('tagline')}
+        </p>
+      </div>
+      
+      {/* Main Content */}
+      <div>
         {!result ? (
           <div className="space-y-3">
           {options.map((option, index) => (

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { I18nProvider, useTranslation } from '@/components/I18nProvider';
-import Header from '@/components/Header';
+
 import LanguageSelector from '@/components/LanguageSelector';
 import PrivacyNotice from '@/components/PrivacyNotice';
 import Picker from '@/components/Picker';
@@ -54,10 +54,10 @@ function AppContent() {
 
   return (
     <MobileOptimizer>
-      <div className="min-h-screen bg-gray-900 pb-20 mobile-safe-area">
-        <Header />
+      <div className="min-h-screen bg-gray-900 mobile-safe-area">
+
         
-        <main className="container mx-auto px-4 py-4 space-y-6 max-w-lg">
+        <main className="container mx-auto px-4 py-4 pb-32 space-y-6 max-w-lg">
             <Picker />
             <StatsDisplay />
             <FlexibleAdBanner />

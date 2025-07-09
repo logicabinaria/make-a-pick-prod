@@ -43,8 +43,27 @@
   },
   "help": {
     "backToApp": "Back to App",
-    "title": "What is Make A Pick?",
+    "title": "Help & Guide",
     "subtitle": "A simple, privacy-focused decision-making tool that helps you choose from multiple options randomly.",
+    "howToUse": {
+      "title": "How to Use",
+      "step1": "Enter your options in the text fields (at least 2 choices required)",
+      "step2": "Click the 'Decide for Me!' button to make a random selection",
+      "step3": "Get your result instantly with a fun animation!"
+    },
+    "features": {
+      "title": "Features",
+      "feature1": "Completely random and fair selection",
+      "feature2": "Privacy-focused - no data stored on servers",
+      "feature3": "Works offline for basic functionality",
+      "feature4": "Multiple language support"
+    },
+    "tips": {
+      "title": "Tips",
+      "tip1": "Add as many options as you want for better variety",
+      "tip2": "Use clear, descriptive names for your choices",
+      "tip3": "Try again if you're not satisfied with the result"
+    },
     "howItWorks": {
       "title": "🎯 How It Works",
       "step1": "Enter your options (at least 2)",
@@ -90,6 +109,29 @@
       "title": "Ready to Make Your Pick?",
       "description": "Start making decisions faster and more fairly with our simple tool.",
       "button": "🎯 Start Picking Now"
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "dataCollection": {
+      "title": "Data Collection",
+      "description": "We do not collect, store, or transmit any personal data. All your choices and decisions remain completely private and are processed locally in your browser."
+    },
+    "localStorage": {
+      "title": "Local Storage",
+      "description": "The app may use your browser's local storage to remember your language preference and improve your experience. This data never leaves your device."
+    },
+    "ads": {
+      "title": "Advertisements",
+      "description": "This app displays advertisements to support its free operation. We work with trusted ad networks that respect user privacy and do not collect personal information beyond what's necessary for ad delivery."
+    },
+    "thirdParty": {
+      "title": "Third-Party Services",
+      "description": "We do not use any third-party tracking services, analytics, or data collection tools. Your privacy is our top priority."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "If you have any questions about this privacy policy or how we handle your data, please feel free to contact us through our support channels."
     }
   },
   "disclaimer": {

@@ -20,7 +20,7 @@ export default function HeaderLanguageSelector() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+        className="flex items-center space-x-2 px-3 py-2 text-white hover:text-gray-200 transition-colors duration-200 rounded-lg hover:bg-white/10"
         aria-label="Change language"
       >
         <svg
@@ -60,7 +60,7 @@ export default function HeaderLanguageSelector() {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
+          <div className="absolute right-0 bottom-full mb-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
             <div className="py-1">
               <button
                 onClick={() => handleLanguageChange('en')}
