@@ -1,10 +1,10 @@
 {
   "appName": "Make a Pick",
   "tagline": "Decide in a Snap!",
-  "addOption": "➕ Add Another Choice",
-  "makeAPick": "🎲 Decide for Me!",
+  "addOption": "Add Another Choice",
+  "makeAPick": "Decide for Me!",
   "enterOption": "What's your choice? (e.g., Pizza, Burger)",
-  "result": "🎉 Decision Made!",
+  "result": "Decision Made!",
   "yourPick": "✨ The winner is:",
   "tryAgain": "Try Again",
   "newDecision": "New Decision",

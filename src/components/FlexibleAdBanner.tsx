@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { 
   ADSENSE_CONFIG, 
   EZOIC_CONFIG,
@@ -12,6 +12,8 @@ import {
   initializeMonetag,
   initializeAdsterra 
 } from '@/config/ads';
+import { refreshAds } from '@/utils/adRefresh';
+import { AD_REFRESH_DELAYS } from '@/config/adRefresh';
 
 interface FlexibleAdBannerProps {
   ezoicPlacementId?: number; // Ezoic ad placement ID (numeric)
@@ -27,7 +29,62 @@ export default function FlexibleAdBanner({
   // Use provided placement ID or get from config based on type
   const finalPlacementId = ezoicPlacementId || EZOIC_CONFIG.placements[placementType];
   const [adLoaded, setAdLoaded] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const adContainerRef = useRef<HTMLDivElement>(null);
   const adInfo = getAdProviderInfo();
+  
+  // Force ad refresh function
+  const refreshAdBanner = useCallback(async () => {
+    setAdLoaded(false);
+    setRefreshKey(prev => prev + 1);
+    
+    // Clear any existing ad content
+    if (adContainerRef.current) {
+      const adElements = adContainerRef.current.querySelectorAll('ins, iframe, script');
+      adElements.forEach(el => el.remove());
+    }
+    
+    try {
+      // Use the global refresh utility with component mount delay
+      const result = await refreshAds({ 
+        delay: AD_REFRESH_DELAYS.COMPONENT_MOUNT, 
+        clearCache: false 
+      });
+      
+      if (!result.success) {
+        console.warn('Ad refresh failed in banner component:', result.error?.message);
+      }
+    } catch (error) {
+      console.error('Ad banner refresh error:', error);
+    }
+  }, []);
+  
+  // Refresh ads when component mounts or when app becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // App became visible, refresh ads after a short delay
+        setTimeout(refreshAdBanner, 1000);
+      }
+    };
+    
+    const handleFocus = () => {
+      // App gained focus, refresh ads
+      setTimeout(refreshAdBanner, 500);
+    };
+    
+    // Listen for visibility and focus changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    
+    // Initial refresh on mount
+    refreshAdBanner();
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [refreshAdBanner]);
 
   useEffect(() => {
     if (adInfo.isEzoic) {
@@ -50,8 +107,16 @@ export default function FlexibleAdBanner({
       }, 500);
       return () => clearTimeout(timer);
     } else if (adInfo.adsenseActive) {
-      // Initialize AdSense
+      // Initialize AdSense with refresh support
       const timer = setTimeout(() => {
+        // Clear any existing AdSense ads first
+        const existingAds = document.querySelectorAll('.adsbygoogle');
+        existingAds.forEach(ad => {
+          if (ad.getAttribute('data-adsbygoogle-status')) {
+            ad.removeAttribute('data-adsbygoogle-status');
+          }
+        });
+        
         initializeAdSense();
         setAdLoaded(true);
       }, 1000);
@@ -72,7 +137,7 @@ export default function FlexibleAdBanner({
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [adInfo.isEzoic, adInfo.adsenseActive, adInfo.monetagActive, adInfo.adsterraActive, finalPlacementId, placementType]);
+  }, [adInfo.isEzoic, adInfo.adsenseActive, adInfo.monetagActive, adInfo.adsterraActive, finalPlacementId, placementType, refreshKey]);
 
   // Don't render anything if no ad provider is active
   if (!adInfo.isActive) {
@@ -80,7 +145,7 @@ export default function FlexibleAdBanner({
   }
 
   return (
-    <div className={`w-full max-w-md mx-auto mt-6 ${className}`}>
+    <div ref={adContainerRef} key={refreshKey} className={`w-full max-w-md mx-auto mt-6 ${className}`}>
       {/* Only show "Advertisement" label when ads are actually active */}
       {(adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive || adInfo.adsterraActive) && (
         <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">

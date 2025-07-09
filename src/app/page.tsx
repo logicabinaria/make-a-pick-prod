@@ -8,6 +8,7 @@ import PrivacyNotice from '@/components/PrivacyNotice';
 import Picker from '@/components/Picker';
 import StatsDisplay from '@/components/StatsDisplay';
 import FlexibleAdBanner from '@/components/FlexibleAdBanner';
+import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 
 import MobileFooter from '@/components/MobileFooter';
 import MobileOptimizer from '@/components/MobileOptimizer';
@@ -61,6 +62,14 @@ function AppContent() {
             <Picker />
             <StatsDisplay />
             <FlexibleAdBanner />
+            <PWAInstallPrompt 
+              variant="banner" 
+              className="sm:hidden"
+            />
+            <PWAInstallPrompt 
+              variant="card" 
+              className="hidden sm:block"
+            />
           </main>
 
         <MobileFooter />

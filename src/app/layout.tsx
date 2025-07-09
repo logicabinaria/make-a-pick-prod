@@ -130,6 +130,28 @@ export default function RootLayout({
             `
           }}
         />
+        
+        {/* Ad Refresh Manager Initialization */}
+        <Script
+          id="ad-refresh-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Initialize ad refresh manager when page loads
+              window.addEventListener('load', function() {
+                // Import and setup ad refresh manager
+                import('/src/utils/adRefresh.js').then(module => {
+                  if (module.setupAdAutoRefresh) {
+                    module.setupAdAutoRefresh();
+                    console.log('Ad refresh manager initialized');
+                  }
+                }).catch(err => {
+                  console.warn('Failed to load ad refresh manager:', err);
+                });
+              });
+            `
+          }}
+        />
       </head>
       <body className="antialiased">
         {children}

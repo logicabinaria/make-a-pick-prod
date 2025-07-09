@@ -1,6 +1,7 @@
 'use client';
 
 import HeaderLanguageSelector from '@/components/HeaderLanguageSelector';
+import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -22,8 +23,12 @@ export default function Header() {
             />
           </div>
           
-          {/* Language Selector and Help Icon */}
+          {/* PWA Install, Language Selector and Help Icon */}
           <div className="flex items-center space-x-2">
+            <PWAInstallPrompt 
+              variant="button" 
+              className="hidden sm:inline-flex text-xs px-3 py-1.5"
+            />
             <HeaderLanguageSelector />
             <Link 
               href="/help"
