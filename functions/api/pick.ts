@@ -1,11 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Env {
-  // Define any environment variables here if needed
-}
-
 export async function onRequestPost(context: {
   request: Request;
-  env: Env;
+  env: Record<string, unknown>;
   params: Record<string, string>;
   waitUntil: (promise: Promise<unknown>) => void;
 }) {
