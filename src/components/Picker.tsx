@@ -3,10 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from '@/components/I18nProvider';
 import confetti from 'canvas-confetti';
-import { pickRandomOption, type PickResult } from '@/utils/clientPicker';
-import { pickRateLimiter } from '@/utils/rateLimiter';
-import { performanceMonitor, preloadCriticalResources } from '@/utils/performance';
-import { withErrorHandling, safeNetworkRequest, errorHandler } from '@/utils/errorHandler';
+import { pickRandomOption } from '@/utils/clientPicker';
 import { useMobile } from '@/hooks/useMobile';
 
 const getInspiringQuotes = (t: (key: string) => string) => [
@@ -30,14 +27,8 @@ export default function Picker() {
   const [previousPick, setPreviousPick] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [useServerFallback] = useState(false);
   const [inspiringText, setInspiringText] = useState<string>('');
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  // Preload resources for better performance
-  useState(() => {
-    preloadCriticalResources();
-  });
 
   const addOption = () => {
     setOptions([...options, '']);
@@ -85,64 +76,14 @@ export default function Picker() {
     setIsLoading(true);
     setError(null);
 
-    const pickOperation = async (): Promise<PickResult> => {
-      // Check rate limit and performance metrics for optimal picking method
-      const rateLimitResult = pickRateLimiter.checkLimit();
-      const shouldUseClientSide = !useServerFallback && rateLimitResult.allowed && performanceMonitor.shouldPreferClientSide();
-      
-      if (shouldUseClientSide) {
-        // Use client-side picker with performance monitoring
-        const clientPickOperation = () => pickRandomOption({
-           options: validOptions,
-           excludePrevious: validOptions.length > 2,
-           previousPick: previousPick || undefined
-         });
-        
-        const { result: clientResult } = await performanceMonitor.measurePickLatency(clientPickOperation);
-        return clientResult;
-      } else {
-        // Use server API with network safety and retry logic
-        const serverOperation = async () => {
-          const response = await fetch('/api/pick', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ options: validOptions }),
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || t('errors.pickFailed'));
-          }
-
-          return {
-            pick: data.pick,
-            index: validOptions.indexOf(data.pick),
-            timestamp: Date.now()
-          };
-        };
-        
-        return await safeNetworkRequest(
-          () => performanceMonitor.measurePickLatency(serverOperation).then(result => result.result),
-          { component: 'Picker', action: 'api_pick', timestamp: Date.now() },
-          2 // max retries
-        );
-      }
-    };
+    // Use client-side picker only
+    const pickResult = pickRandomOption({
+      options: validOptions,
+      excludePrevious: validOptions.length > 2,
+      previousPick: previousPick || undefined
+    });
 
     try {
-      const pickResult = await withErrorHandling(
-        pickOperation,
-        { component: 'Picker', action: 'make_pick', timestamp: Date.now() },
-        // Fallback to client-side picking if everything fails
-        () => pickRandomOption({
-          options: validOptions,
-          excludePrevious: false
-        })
-      );
-
       setResult(pickResult.pick);
       setPreviousPick(pickResult.pick);
       
@@ -151,7 +92,7 @@ export default function Picker() {
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
       setInspiringText(randomQuote);
       
-      // Trigger confetti animation with error handling and mobile optimization
+      // Trigger confetti animation with mobile optimization
       try {
         const particleCount = mobile.isMobile ? 50 : 100;
         const spread = mobile.isMobile ? 50 : 70;
@@ -167,18 +108,11 @@ export default function Picker() {
       }
       
     } catch (err) {
-      // Handle the error gracefully
-      const appError = errorHandler.handleError(
-        err as Error,
-        { component: 'Picker', action: 'make_pick', timestamp: Date.now() },
-        'medium'
-      );
-      
-      setError(appError.message);
+      setError(err instanceof Error ? err.message : t('errors.pickFailed'));
     } finally {
       setIsLoading(false);
     }
-  }, [options, t, previousPick, useServerFallback, mobile.isMobile]);
+  }, [options, t, previousPick, mobile.isMobile]);
 
   const tryAgain = useCallback(() => {
     setResult(null);
