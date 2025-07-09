@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react';
 import { 
   ADSENSE_CONFIG, 
   EZOIC_CONFIG,
+  MONETAG_CONFIG,
   getAdProviderInfo, 
   initializeAdSense, 
-  initializeEzoic 
+  initializeEzoic,
+  initializeMonetag 
 } from '@/config/ads';
 
 interface FlexibleAdBannerProps {
@@ -52,14 +54,29 @@ export default function FlexibleAdBanner({
         setAdLoaded(true);
       }, 1000);
       return () => clearTimeout(timer);
+    } else if (adInfo.monetagActive) {
+      // Initialize Monetag
+      const timer = setTimeout(() => {
+        initializeMonetag();
+        setAdLoaded(true);
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [adInfo.isEzoic, adInfo.adsenseActive, finalPlacementId]);
+  }, [adInfo.isEzoic, adInfo.adsenseActive, adInfo.monetagActive, finalPlacementId]);
+
+  // Don't render anything if no ad provider is active
+  if (!adInfo.isActive) {
+    return null;
+  }
 
   return (
     <div className={`w-full max-w-md mx-auto mt-6 ${className}`}>
-      <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
-        Advertisement
-      </div>
+      {/* Only show "Advertisement" label when ads are actually active */}
+      {(adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive) && (
+        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
+          Advertisement
+        </div>
+      )}
       
       {/* Ezoic Ad */}
       {adInfo.isEzoic && (
@@ -103,6 +120,25 @@ export default function FlexibleAdBanner({
         </>
       )}
       
+      {/* Monetag Ad */}
+      {adInfo.monetagActive && (
+        <>
+          <div 
+            id={MONETAG_CONFIG.placements[placementType].id}
+            className="min-h-[90px] max-h-[120px] flex items-center justify-center"
+          >
+            {!adLoaded && (
+              <div className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-center animate-pulse">
+                <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Loading Monetag ad...
+                </p>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+      
       {/* Placeholder when no ad provider is active */}
       {!adInfo.isActive && (
         <div className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
@@ -116,13 +152,15 @@ export default function FlexibleAdBanner({
         </div>
       )}
       
-      {/* Debug info in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs">
+      {/* Debug info in development - only show when ads are active */}
+      {process.env.NODE_ENV === 'development' && (adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive) && (
+        <div className="mt-2 p-2 rounded text-xs bg-blue-50 dark:bg-blue-900/20">
           <strong>Ad Debug:</strong> Provider: {adInfo.provider} | 
           Ezoic: {adInfo.ezoicActive ? '✅' : '❌'} | 
-          AdSense: {adInfo.adsenseActive ? '✅' : '❌'} |
+          AdSense: {adInfo.adsenseActive ? '✅' : '❌'} | 
+          Monetag: {adInfo.monetagActive ? '✅' : '❌'} |
           {adInfo.isEzoic && ` Placement: ${finalPlacementId} (${placementType})`}
+          {adInfo.isMonetag && ` Placement: ${MONETAG_CONFIG.placements[placementType].id} (${placementType})`}
         </div>
       )}
     </div>

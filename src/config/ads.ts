@@ -1,11 +1,11 @@
 // Flexible Ad Configuration - Supports Ezoic and Google AdSense
 // Switch between ad providers by changing the AD_PROVIDER constant
 
-export type AdProvider = 'ezoic' | 'adsense' | 'none';
+export type AdProvider = 'ezoic' | 'adsense' | 'monetag' | 'none';
 
 // Change this to switch between ad providers
 // Note: Change this value to switch between providers
-const AD_PROVIDER_SETTING: AdProvider = 'ezoic'; // Options: 'ezoic', 'adsense', 'none'
+const AD_PROVIDER_SETTING: AdProvider = 'monetag'; // Options: 'ezoic', 'adsense', 'monetag', 'none'
 export const AD_PROVIDER = AD_PROVIDER_SETTING;
 
 // Ezoic Configuration
@@ -68,6 +68,37 @@ export const ADSENSE_CONFIG = {
   }
 };
 
+// Monetag Configuration
+export const MONETAG_CONFIG = {
+  // Monetag verification meta tag content
+  metaContent: '4d9ab32e84c95f6a2550e62a49385baf',
+  
+  // Monetag ad placement configurations
+  placements: {
+    banner: {
+      id: 'monetag-banner',
+      type: 'banner'
+    },
+    sidebar: {
+      id: 'monetag-sidebar', 
+      type: 'sidebar'
+    },
+    footer: {
+      id: 'monetag-footer',
+      type: 'footer'
+    },
+    inContent: {
+      id: 'monetag-content',
+      type: 'in-content'
+    }
+  },
+  
+  // Check if Monetag is the selected provider
+  get isActive() {
+    return (AD_PROVIDER as string) === 'monetag';
+  }
+};
+
 // Ezoic window interface
 declare global {
   interface Window {
@@ -113,6 +144,19 @@ export const initializeAdSense = () => {
   }
 };
 
+// Monetag initialization helper
+export const initializeMonetag = () => {
+  if (typeof window !== 'undefined' && MONETAG_CONFIG.isActive) {
+    try {
+      // Monetag initialization logic will be added here
+      // Currently just a placeholder for future implementation
+      console.log('Monetag initialized');
+    } catch (error) {
+      console.error('Monetag initialization error:', error);
+    }
+  }
+};
+
 // Generic ad unit component props
 export interface AdUnitProps {
   slot?: string;
@@ -128,8 +172,10 @@ export const getAdProviderInfo = () => {
     provider: AD_PROVIDER,
     isEzoic: (AD_PROVIDER as string) === 'ezoic',
     isAdSense: (AD_PROVIDER as string) === 'adsense',
+    isMonetag: (AD_PROVIDER as string) === 'monetag',
     isActive: (AD_PROVIDER as string) !== 'none',
     ezoicActive: EZOIC_CONFIG.isActive,
-    adsenseActive: ADSENSE_CONFIG.isActive
+    adsenseActive: ADSENSE_CONFIG.isActive,
+    monetagActive: MONETAG_CONFIG.isActive
   };
 };

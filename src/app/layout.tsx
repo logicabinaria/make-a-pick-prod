@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { ADSENSE_CONFIG, EZOIC_CONFIG } from "@/config/ads";
+import { ADSENSE_CONFIG, EZOIC_CONFIG, MONETAG_CONFIG } from "@/config/ads";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   },
   other: {
     "google-adsense-account": "ca-pub-6150853912343151",
+    ...(MONETAG_CONFIG.isActive && { "monetag": MONETAG_CONFIG.metaContent }),
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
