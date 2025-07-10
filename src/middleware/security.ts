@@ -77,6 +77,10 @@ function generateCSPHeader(): string {
       "'self'",
       ...allowedDomains
     ],
+    'fenced-frame-src': [
+      "'self'",
+      ...allowedDomains
+    ],
     'object-src': ["'none'"],
     'base-uri': ["'self'"],
     'form-action': ["'self'"]
