@@ -25,19 +25,40 @@ export const ADSENSE_CONFIG = {
 // AdSense window interface
 declare global {
   interface Window {
-    adsbygoogle: unknown[];
+    adsbygoogle?: unknown[];
   }
 }
 
 // AdSense initialization helper
+// Track if AdSense has been initialized to prevent duplicate calls
+let adsenseInitialized = false;
+
 export const initializeAdSense = () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && ADSENSE_CONFIG.isConfigured && !adsenseInitialized) {
     try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      // Ensure adsbygoogle array exists
+      window.adsbygoogle = window.adsbygoogle || [];
+      
+      // Only push if there are unprocessed ads
+      const unprocessedAds = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
+      
+      if (unprocessedAds.length > 0) {
+        window.adsbygoogle.push({});
+        adsenseInitialized = true;
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('AdSense initialized for', unprocessedAds.length, 'ad units');
+        }
+      }
     } catch (error) {
       console.error('AdSense initialization error:', error);
     }
   }
+};
+
+// Function to reset initialization state (useful for ad refresh)
+export const resetAdSenseInitialization = () => {
+  adsenseInitialized = false;
 };
 
 // AdSense ad unit component props

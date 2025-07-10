@@ -4,10 +4,10 @@ import { ADSENSE_CONFIG, EZOIC_CONFIG, MONETAG_CONFIG } from "@/config/ads";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Make a Pick - Random Decision Maker",
+  title: "MAKE A PICK - Random Decision Maker",
   description: "A privacy-focused app to help you make random decisions from your custom options. Available in English and Bangla.",
   keywords: "decision maker, random picker, choice selector, privacy-focused",
-  authors: [{ name: "Make a Pick" }],
+  authors: [{ name: "MAKE A PICK" }],
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Make a Pick",
+    title: "MAKE A PICK",
   },
   formatDetection: {
     telephone: false,
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
-    "apple-mobile-web-app-title": "Make a Pick",
-    "application-name": "Make a Pick",
+    "apple-mobile-web-app-title": "MAKE A PICK",
+    "application-name": "MAKE A PICK",
     "msapplication-TileColor": "#16a34a",
     "theme-color": "#16a34a",
   },
@@ -68,7 +68,7 @@ export default function RootLayout({
         {/* Ezoic Privacy Scripts - Load first for GDPR compliance */}
         {EZOIC_CONFIG.isActive && (
           <>
-            {EZOIC_CONFIG.privacyScripts.map((src, index) => (
+            {EZOIC_CONFIG.privacyScripts?.map((src, index) => (
               <Script
                 key={`ezoic-privacy-${index}`}
                 src={src}
@@ -103,10 +103,19 @@ export default function RootLayout({
         {/* Google AdSense - Only load if configured and active */}
         {ADSENSE_CONFIG.isActive && (
           <Script
-            async
-            src={ADSENSE_CONFIG.scriptUrl}
-            crossOrigin="anonymous"
+            id="google-adsense"
             strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  var script = document.createElement('script');
+                  script.async = true;
+                  script.src = '${ADSENSE_CONFIG.scriptUrl}';
+                  script.crossOrigin = 'anonymous';
+                  document.head.appendChild(script);
+                })();
+              `
+            }}
           />
         )}
         
@@ -153,7 +162,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning={true}>
         {children}
       </body>
     </html>

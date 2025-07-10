@@ -70,12 +70,17 @@ export const usePWAInstall = (): UsePWAInstallReturn => {
       
       const installEvent = e as BeforeInstallPromptEvent;
       
+      // Store the event for later use
       setPwaState(prev => ({
         ...prev,
         isInstallable: true,
         installPromptEvent: installEvent,
         showInstallPrompt: shouldShowPrompt()
       }));
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('PWA install prompt event captured and stored');
+      }
     };
 
     const handleAppInstalled = () => {
@@ -125,16 +130,46 @@ export const usePWAInstall = (): UsePWAInstallReturn => {
     return true;
   }, []);
 
+  // Dismiss the install prompt
+  const dismissPrompt = useCallback(() => {
+    localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+    setPwaState(prev => ({ ...prev, showInstallPrompt: false }));
+    
+    // Track dismissal
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      const gtag = (window as { gtag: (command: string, eventName: string, parameters?: Record<string, unknown>) => void }).gtag;
+      gtag('event', 'pwa_prompt_dismissed', {
+        event_category: 'PWA',
+        event_label: 'Install Prompt Manually Dismissed'
+      });
+    }
+  }, []);
+
   // Install the app
   const installApp = useCallback(async (): Promise<boolean> => {
-    if (!pwaState.installPromptEvent) return false;
+    if (!pwaState.installPromptEvent) {
+      console.warn('No install prompt event available');
+      return false;
+    }
 
     try {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Triggering PWA install prompt...');
+      }
+      
       // Show the install prompt
       await pwaState.installPromptEvent.prompt();
       
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Install prompt shown, waiting for user choice...');
+      }
+      
       // Wait for the user to respond to the prompt
       const choiceResult = await pwaState.installPromptEvent.userChoice;
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('User choice:', choiceResult.outcome);
+      }
       
       if (choiceResult.outcome === 'accepted') {
         // Track successful installation prompt
@@ -152,6 +187,10 @@ export const usePWAInstall = (): UsePWAInstallReturn => {
           installPromptEvent: null
         }));
         
+        if (process.env.NODE_ENV === 'development') {
+          console.log('PWA installation accepted');
+        }
+        
         return true;
       } else {
         // Track dismissed installation prompt
@@ -163,30 +202,26 @@ export const usePWAInstall = (): UsePWAInstallReturn => {
           });
         }
         
+        if (process.env.NODE_ENV === 'development') {
+          console.log('PWA installation dismissed');
+        }
+        
         dismissPrompt();
         return false;
       }
     } catch (error) {
-      console.error('Error during app installation:', error);
+      console.error('Error during PWA installation:', error);
+      
+      // Reset state on error
+      setPwaState(prev => ({
+        ...prev,
+        showInstallPrompt: false,
+        installPromptEvent: null
+      }));
+      
       return false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pwaState.installPromptEvent]);
-
-  // Dismiss the install prompt
-  const dismissPrompt = useCallback(() => {
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString());
-    setPwaState(prev => ({ ...prev, showInstallPrompt: false }));
-    
-    // Track dismissal
-    if (typeof window !== 'undefined' && 'gtag' in window) {
-      const gtag = (window as { gtag: (command: string, eventName: string, parameters?: Record<string, unknown>) => void }).gtag;
-      gtag('event', 'pwa_prompt_dismissed', {
-        event_category: 'PWA',
-        event_label: 'Install Prompt Manually Dismissed'
-      });
-    }
-  }, []);
+  }, [pwaState.installPromptEvent, dismissPrompt]);
 
   // Reset prompt (for testing or manual trigger)
   const resetPrompt = useCallback(() => {
@@ -195,8 +230,7 @@ export const usePWAInstall = (): UsePWAInstallReturn => {
       ...prev,
       showInstallPrompt: prev.isInstallable && shouldShowPrompt()
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [shouldShowPrompt]);
 
   return {
     pwaState,

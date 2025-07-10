@@ -24,13 +24,13 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
   const [isInstalling, setIsInstalling] = useState(false);
   const [showIOSModal, setShowIOSModal] = useState(false);
 
-  // Don't render if already installed or not installable
+  // Don't render if PWA is already installed or not installable
   if (pwaState.isInstalled || (!pwaState.isInstallable && !isIOSDevice)) {
     return null;
   }
 
-  // Don't show if prompt is dismissed
-  if (!pwaState.showInstallPrompt && !isIOSDevice) {
+  // Don't render if install prompt should not be shown (for non-iOS devices)
+  if (!isIOSDevice && !pwaState.showInstallPrompt) {
     return null;
   }
 

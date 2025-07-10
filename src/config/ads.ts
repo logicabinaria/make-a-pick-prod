@@ -1,6 +1,15 @@
 // Flexible Ad Configuration - Supports Ezoic and Google AdSense
 // Switch between ad providers by changing the AD_PROVIDER constant
 
+import type { 
+  EzoicConfig, 
+  AdSenseConfig, 
+  MonetagConfig, 
+  AdsterraConfig,
+  AdProviderInfo,
+  AdProviderType
+} from '@/types/ads';
+
 export type AdProvider = 'ezoic' | 'adsense' | 'monetag' | 'adsterra' | 'none';
 
 // Read ad provider from environment variables
@@ -10,7 +19,7 @@ const AD_PROVIDER_SETTING: AdProvider = (process.env.NEXT_PUBLIC_AD_PROVIDER as 
 export const AD_PROVIDER = AD_PROVIDER_SETTING;
 
 // Ezoic Configuration
-export const EZOIC_CONFIG = {
+export const EZOIC_CONFIG: EzoicConfig = {
   // Ezoic privacy scripts (required for GDPR compliance)
   privacyScripts: [
     'https://cmp.gatekeeperconsent.com/min.js',
@@ -41,7 +50,7 @@ export const EZOIC_CONFIG = {
 };
 
 // Google AdSense Configuration
-export const ADSENSE_CONFIG = {
+export const ADSENSE_CONFIG: AdSenseConfig = {
   // Your Google AdSense Publisher ID (configure in .env.local)
   publisherId: process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || 'ca-pub-XXXXXXXXXXXXXXXXX',
   
@@ -59,18 +68,18 @@ export const ADSENSE_CONFIG = {
   get isActive() {
     return (AD_PROVIDER as string) === 'adsense' && 
            this.publisherId !== 'ca-pub-XXXXXXXXXXXXXXXXX' && 
-           this.adSlots.banner !== '1234567890';
+           this.adSlots?.banner !== '1234567890';
   },
   
   // Legacy compatibility
   get isConfigured() {
     return this.publisherId !== 'ca-pub-XXXXXXXXXXXXXXXXX' && 
-           this.adSlots.banner !== '1234567890';
+           this.adSlots?.banner !== '1234567890';
   }
 };
 
 // Monetag Configuration
-export const MONETAG_CONFIG = {
+export const MONETAG_CONFIG: MonetagConfig = {
   // Monetag verification meta tag content (configure in .env.local)
   metaContent: process.env.NEXT_PUBLIC_MONETAG_META_CONTENT || '',
   
@@ -104,7 +113,7 @@ export const MONETAG_CONFIG = {
 };
 
 // Adsterra Configuration
-export const ADSTERRA_CONFIG = {
+export const ADSTERRA_CONFIG: AdsterraConfig = {
   // Adsterra ad configuration (configure in .env.local)
   key: process.env.NEXT_PUBLIC_ADSTERRA_KEY || '88fb5a09f71069802bf883c6dc2a331e',
   
@@ -144,24 +153,15 @@ export const ADSTERRA_CONFIG = {
   }
 };
 
-// Global window interface
+// Additional window properties for Adsterra
 declare global {
   interface Window {
-    ezstandalone: {
-      cmd: Array<() => void>;
-      config?: (options: Record<string, unknown>) => void;
-      showAds?: (...placementIds: number[]) => void;
-      setEzoicAnchorAd?: (enabled: boolean) => void;
-      hasAnchorAdBeenClosed?: () => boolean;
-      isEzoicUser?: (percentage: number) => boolean;
-    };
-    adsbygoogle: unknown[];
-    atOptions: {
-      key: string;
-      format: string;
-      height: number;
-      width: number;
-      params: Record<string, unknown>;
+    atOptions?: {
+      key?: string;
+      format?: string;
+      height?: number;
+      width?: number;
+      params?: Record<string, unknown>;
     };
   }
 }
@@ -174,8 +174,8 @@ export const initializeEzoic = () => {
       window.ezstandalone.cmd = window.ezstandalone.cmd || [];
       
       // Configure Ezoic options with cache-busting
-      window.ezstandalone.cmd.push(function() {
-        if (window.ezstandalone.config) {
+      window.ezstandalone.cmd?.push(function() {
+        if (window.ezstandalone?.config) {
           const configWithCacheBusting = {
             ...EZOIC_CONFIG.options,
             refresh_ads: true,
@@ -185,7 +185,9 @@ export const initializeEzoic = () => {
         }
       });
       
-      console.log('Ezoic initialized with refresh support');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Ezoic initialized with refresh support');
+      }
     } catch (error) {
       console.error('Ezoic initialization error:', error);
     }
@@ -193,28 +195,8 @@ export const initializeEzoic = () => {
 };
 
 // AdSense initialization helper with refresh support
-export const initializeAdSense = () => {
-  if (typeof window !== 'undefined' && ADSENSE_CONFIG.isActive) {
-    try {
-      // Ensure adsbygoogle array exists
-      window.adsbygoogle = window.adsbygoogle || [];
-      
-      // Add cache-busting parameter to force fresh ad requests
-      const timestamp = Date.now();
-      
-      // Push ad request with cache-busting
-      window.adsbygoogle.push({
-        google_ad_modifications: {
-          eids: [timestamp.toString()]
-        }
-      });
-      
-      console.log('AdSense initialized with cache-busting:', timestamp);
-    } catch (error) {
-      console.error('AdSense initialization error:', error);
-    }
-  }
-};
+// Import AdSense initialization from dedicated config
+export { initializeAdSense, resetAdSenseInitialization } from './adsense';
 
 // Monetag initialization helper with refresh support
 export const initializeMonetag = () => {
@@ -234,7 +216,9 @@ export const initializeMonetag = () => {
       // Add script to document head
       document.head.appendChild(script);
       
-      console.log('Monetag script loaded with cache-busting:', cacheBustUrl);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Monetag script loaded with cache-busting:', cacheBustUrl);
+      }
     } catch (error) {
       console.error('Monetag initialization error:', error);
     }
@@ -287,7 +271,9 @@ export const initializeAdsterra = (containerId?: string) => {
         
         document.head.appendChild(script);
         
-        console.log('Adsterra script loaded in head with cache-busting:', cacheBustUrl);
+        if (process.env.NODE_ENV === 'development') {
+        console.log('Adsterra script loaded with cache-busting:', cacheBustUrl);
+      }
       }
     } catch (error) {
       console.error('Adsterra initialization error:', error);
@@ -304,18 +290,17 @@ export interface AdUnitProps {
   ezoicId?: string; // For Ezoic ad placements
 }
 
-// Helper to get current ad provider info
-export const getAdProviderInfo = () => {
+// Helper function to get current ad provider info
+export function getAdProviderInfo(): AdProviderInfo {
+  const provider = process.env.NEXT_PUBLIC_AD_PROVIDER || 'none';
+  
   return {
-    provider: AD_PROVIDER,
-    isEzoic: (AD_PROVIDER as string) === 'ezoic',
-    isAdSense: (AD_PROVIDER as string) === 'adsense',
-    isMonetag: (AD_PROVIDER as string) === 'monetag',
-    isAdsterra: (AD_PROVIDER as string) === 'adsterra',
-    isActive: (AD_PROVIDER as string) !== 'none',
+    name: provider as AdProviderType,
+    provider: provider,
+    isActive: provider !== 'none',
     ezoicActive: EZOIC_CONFIG.isActive,
     adsenseActive: ADSENSE_CONFIG.isActive,
     monetagActive: MONETAG_CONFIG.isActive,
     adsterraActive: ADSTERRA_CONFIG.isActive
   };
-};
+}

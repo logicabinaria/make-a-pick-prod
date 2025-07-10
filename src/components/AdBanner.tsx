@@ -7,10 +7,13 @@ export default function AdBanner() {
   const [adLoaded, setAdLoaded] = useState(false);
 
   useEffect(() => {
-    // Only initialize AdSense if properly configured
+    // Only initialize AdSense if properly configured and there are unprocessed ads
     if (ADSENSE_CONFIG.isConfigured) {
       const timer = setTimeout(() => {
-        initializeAdSense();
+        const unprocessedAds = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
+        if (unprocessedAds.length > 0) {
+          initializeAdSense();
+        }
         setAdLoaded(true);
       }, 1000); // Small delay to ensure DOM is ready
 

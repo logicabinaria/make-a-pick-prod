@@ -12,6 +12,7 @@ import {
   initializeMonetag,
   initializeAdsterra 
 } from '@/config/ads';
+import AdErrorBoundary from './AdErrorBoundary';
 import { refreshAds } from '@/utils/adRefresh';
 import { AD_REFRESH_DELAYS } from '@/config/adRefresh';
 
@@ -27,16 +28,15 @@ export default function FlexibleAdBanner({
   className = '' 
 }: FlexibleAdBannerProps) {
   // Use provided placement ID or get from config based on type
-  const finalPlacementId = ezoicPlacementId || EZOIC_CONFIG.placements[placementType];
+  const finalPlacementId = ezoicPlacementId || EZOIC_CONFIG.placements?.[placementType];
   const [adLoaded, setAdLoaded] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const adContainerRef = useRef<HTMLDivElement>(null);
   const adInfo = getAdProviderInfo();
   
-  // Force ad refresh function
-  const refreshAdBanner = useCallback(async () => {
+  // Initialize ads and handle refresh
+  const initializeAds = useCallback(async () => {
     setAdLoaded(false);
-    setRefreshKey(prev => prev + 1);
     
     // Clear any existing ad content
     if (adContainerRef.current) {
@@ -44,9 +44,49 @@ export default function FlexibleAdBanner({
       adElements.forEach(el => el.remove());
     }
     
+    // Initialize based on active provider
+    if (adInfo.ezoicActive) {
+      initializeEzoic();
+      
+      // Show Ezoic ads using the proper API
+      if (typeof window !== 'undefined' && window.ezstandalone) {
+        const ezstandalone = window.ezstandalone;
+        ezstandalone.cmd = ezstandalone.cmd || [];
+        ezstandalone.cmd.push(function() {
+          if (ezstandalone.showAds && finalPlacementId) {
+            ezstandalone.showAds(Number(finalPlacementId));
+          }
+        });
+      }
+    } else if (adInfo.adsenseActive) {
+      // Only initialize if there are unprocessed AdSense ads
+      const unprocessedAds = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
+      if (unprocessedAds.length > 0) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          initializeAdSense();
+        }, 100);
+      }
+    } else if (adInfo.monetagActive) {
+      initializeMonetag();
+    } else if (adInfo.adsterraActive) {
+      const containerId = ADSTERRA_CONFIG.placements?.[placementType]?.id;
+      if (containerId) {
+        initializeAdsterra(containerId);
+      }
+    }
+    
+    setAdLoaded(true);
+  }, [adInfo.ezoicActive, adInfo.adsenseActive, adInfo.monetagActive, adInfo.adsterraActive, finalPlacementId, placementType]);
+  
+  // Force ad refresh function for external calls
+  const refreshAdBanner = useCallback(async () => {
+    setRefreshKey(prev => prev + 1);
+    
     try {
-      // Use the global refresh utility with component mount delay
+      // Use the global refresh utility with force flag to bypass rate limiting
       const result = await refreshAds({ 
+        force: true,
         delay: AD_REFRESH_DELAYS.COMPONENT_MOUNT, 
         clearCache: false 
       });
@@ -59,7 +99,7 @@ export default function FlexibleAdBanner({
     }
   }, []);
   
-  // Refresh ads when component mounts or when app becomes visible
+  // Initialize ads on mount and handle visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -77,67 +117,24 @@ export default function FlexibleAdBanner({
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
     
-    // Initial refresh on mount
-    refreshAdBanner();
+    // Initial ad initialization on mount
+    initializeAds();
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [refreshAdBanner]);
+  }, [initializeAds, refreshAdBanner]);
 
+  // Re-initialize ads when refreshKey changes (for forced refreshes)
   useEffect(() => {
-    if (adInfo.isEzoic) {
-      // Initialize Ezoic and show ads
+    if (refreshKey > 0) {
       const timer = setTimeout(() => {
-        initializeEzoic();
-        
-        // Show Ezoic ads using the proper API
-        if (typeof window !== 'undefined' && window.ezstandalone) {
-          const ezstandalone = window.ezstandalone;
-          ezstandalone.cmd = ezstandalone.cmd || [];
-          ezstandalone.cmd.push(function() {
-            if (ezstandalone.showAds) {
-              ezstandalone.showAds(finalPlacementId);
-            }
-          });
-        }
-        
-        setAdLoaded(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    } else if (adInfo.adsenseActive) {
-      // Initialize AdSense with refresh support
-      const timer = setTimeout(() => {
-        // Clear any existing AdSense ads first
-        const existingAds = document.querySelectorAll('.adsbygoogle');
-        existingAds.forEach(ad => {
-          if (ad.getAttribute('data-adsbygoogle-status')) {
-            ad.removeAttribute('data-adsbygoogle-status');
-          }
-        });
-        
-        initializeAdSense();
-        setAdLoaded(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (adInfo.monetagActive) {
-      // Initialize Monetag
-      const timer = setTimeout(() => {
-        initializeMonetag();
-        setAdLoaded(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    } else if (adInfo.adsterraActive) {
-      // Initialize Adsterra
-      const timer = setTimeout(() => {
-        const containerId = ADSTERRA_CONFIG.placements[placementType].id;
-        initializeAdsterra(containerId);
-        setAdLoaded(true);
-      }, 500);
+        initializeAds();
+      }, 100);
       return () => clearTimeout(timer);
     }
-  }, [adInfo.isEzoic, adInfo.adsenseActive, adInfo.monetagActive, adInfo.adsterraActive, finalPlacementId, placementType, refreshKey]);
+  }, [refreshKey, initializeAds]);
 
   // Don't render anything if no ad provider is active
   if (!adInfo.isActive) {
@@ -145,16 +142,17 @@ export default function FlexibleAdBanner({
   }
 
   return (
-    <div ref={adContainerRef} key={refreshKey} className={`w-full max-w-md mx-auto mt-6 ${className}`}>
-      {/* Only show "Advertisement" label when ads are actually active */}
-      {(adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive || adInfo.adsterraActive) && (
-        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
-          Advertisement
-        </div>
-      )}
+    <AdErrorBoundary>
+      <div ref={adContainerRef} key={refreshKey} className={`w-full max-w-md mx-auto mt-6 ${className}`}>
+        {/* Only show "Advertisement" label when ads are actually active */}
+        {(adInfo.ezoicActive || adInfo.adsenseActive || adInfo.monetagActive || adInfo.adsterraActive) && (
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">
+            Advertisement
+          </div>
+        )}
       
       {/* Ezoic Ad */}
-      {adInfo.isEzoic && (
+      {adInfo.ezoicActive && (
         <>
           {/* Ezoic placeholder div - DO NOT add styling as per Ezoic docs */}
           <div id={`ezoic-pub-ad-placeholder-${finalPlacementId}`}>
@@ -176,12 +174,12 @@ export default function FlexibleAdBanner({
       {adInfo.adsenseActive && (
         <>
           <ins
-            className="adsbygoogle block"
-            style={{ display: 'block', minHeight: '90px', maxHeight: '120px' }}
+            className="adsbygoogle"
+            style={{ display: 'block' }}
             data-ad-client={ADSENSE_CONFIG.publisherId}
-            data-ad-slot={ADSENSE_CONFIG.adSlots.banner}
-            data-ad-format="horizontal"
-            data-full-width-responsive="true"
+            data-ad-slot={ADSENSE_CONFIG.adSlots?.banner}
+            data-ad-format="fluid"
+            data-ad-layout-key="-ef+6k-30-ac+ty"
           ></ins>
           
           {!adLoaded && (
@@ -199,7 +197,7 @@ export default function FlexibleAdBanner({
       {adInfo.monetagActive && (
         <>
           <div 
-            id={MONETAG_CONFIG.placements[placementType].id}
+            id={MONETAG_CONFIG.placements?.[placementType]?.id}
             className="min-h-[90px] w-full flex items-center justify-center"
             style={{ minHeight: '90px' }}
           >
@@ -219,7 +217,7 @@ export default function FlexibleAdBanner({
       {/* Adsterra Ad */}
       {adInfo.adsterraActive && (
         <div 
-          id={ADSTERRA_CONFIG.placements[placementType].id}
+          id={ADSTERRA_CONFIG.placements?.[placementType]?.id}
           className="w-full flex items-center justify-center"
           style={{ 
             minHeight: `${ADSTERRA_CONFIG.height}px`, 
@@ -254,11 +252,12 @@ export default function FlexibleAdBanner({
           AdSense: {adInfo.adsenseActive ? '✅' : '❌'} | 
           Monetag: {adInfo.monetagActive ? '✅' : '❌'} |
           Adsterra: {adInfo.adsterraActive ? '✅' : '❌'} |
-          {adInfo.isEzoic && ` Placement: ${finalPlacementId} (${placementType})`}
-          {adInfo.isMonetag && ` Placement: ${MONETAG_CONFIG.placements[placementType].id} (${placementType})`}
-          {adInfo.isAdsterra && ` Placement: ${ADSTERRA_CONFIG.placements[placementType].id} (${placementType}) | Key: ${ADSTERRA_CONFIG.key}`}
+          {adInfo.ezoicActive && ` Placement: ${finalPlacementId} (${placementType})`}
+          {adInfo.monetagActive && ` Placement: ${MONETAG_CONFIG.placements?.[placementType]?.id} (${placementType})`}
+          {adInfo.adsterraActive && ` Placement: ${ADSTERRA_CONFIG.placements?.[placementType]?.id} (${placementType}) | Key: ${ADSTERRA_CONFIG.key}`}
         </div>
       )}
-    </div>
+      </div>
+    </AdErrorBoundary>
   );
 }

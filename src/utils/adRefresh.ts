@@ -4,6 +4,7 @@
 import { 
   getAdProviderInfo, 
   initializeAdSense, 
+  resetAdSenseInitialization,
   initializeEzoic, 
   initializeMonetag, 
   initializeAdsterra,
@@ -192,7 +193,7 @@ class AdRefreshManager {
     const timeout = this.getProviderTimeout(adInfo.provider);
     
     const refreshPromise = (async () => {
-      if (adInfo.isEzoic) {
+      if (adInfo.ezoicActive) {
         await this.refreshEzoicAds();
       } else if (adInfo.adsenseActive) {
         await this.refreshAdSenseAds();
@@ -253,9 +254,9 @@ class AdRefreshManager {
         initializeEzoic();
         
         // Show ads for all placements
-        const placements = Object.values(EZOIC_CONFIG.placements);
-        window.ezstandalone.cmd.push(function() {
-          if (window.ezstandalone.showAds) {
+        const placements = Object.values(EZOIC_CONFIG.placements || {});
+        window.ezstandalone.cmd?.push(function() {
+          if (window.ezstandalone?.showAds) {
             window.ezstandalone.showAds(...placements);
           }
         });
@@ -293,7 +294,10 @@ class AdRefreshManager {
         }
       });
 
-      // Reinitialize AdSense
+      // Reset initialization state to allow re-initialization
+      resetAdSenseInitialization();
+      
+      // Reinitialize AdSense after a short delay
       await new Promise(resolve => setTimeout(resolve, 100));
       initializeAdSense();
       
