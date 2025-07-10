@@ -36,12 +36,28 @@ function getActiveAdProvider(): string {
 // Generate CSP header based on active ad provider
 function generateCSPHeader(): string {
   const activeProvider = getActiveAdProvider().toUpperCase();
+  
+  // For AdSense, use Google's recommended strict CSP approach
+  if (activeProvider === 'ADSENSE') {
+    // Google's recommended strict CSP for AdSense
+    // Reference: https://support.google.com/adsense/answer/16283098
+    return [
+      "object-src 'none'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:",
+      "style-src 'self' 'unsafe-inline' https:",
+      "img-src 'self' data: blob: https:",
+      "connect-src 'self' https:",
+      "frame-src 'self' https:",
+      "fenced-frame-src 'self' https:",
+      "base-uri 'none'",
+      "form-action 'self'"
+    ].join('; ');
+  }
+  
+  // For other providers, use domain-based approach
   let allowedDomains: string[] = [];
-
-  // Add domains based on active provider
-  if (activeProvider === 'ADSENSE' && AD_DOMAINS.ADSENSE) {
-    allowedDomains = [...allowedDomains, ...AD_DOMAINS.ADSENSE];
-  } else if (activeProvider === 'EZOIC' && AD_DOMAINS.EZOIC) {
+  
+  if (activeProvider === 'EZOIC' && AD_DOMAINS.EZOIC) {
     allowedDomains = [...allowedDomains, ...AD_DOMAINS.EZOIC];
   } else if (activeProvider === 'MONETAG' && AD_DOMAINS.MONETAG) {
     allowedDomains = [...allowedDomains, ...AD_DOMAINS.MONETAG];
@@ -49,18 +65,18 @@ function generateCSPHeader(): string {
     allowedDomains = [...allowedDomains, ...AD_DOMAINS.ADSTERRA];
   }
 
-  // Base CSP policy
+  // Base CSP policy for non-AdSense providers
   const basePolicy = {
     'default-src': ["'self'"],
     'script-src': [
       "'self'",
-      "'unsafe-inline'", // Required for ad scripts
-      "'unsafe-eval'", // Some ad providers require eval
+      "'unsafe-inline'",
+      "'unsafe-eval'",
       ...allowedDomains
     ],
     'style-src': [
       "'self'",
-      "'unsafe-inline'", // Required for ad styles
+      "'unsafe-inline'",
       ...allowedDomains
     ],
     'img-src': [
