@@ -149,7 +149,7 @@ export default function RootLayout({
               // Initialize ad refresh manager when page loads
               window.addEventListener('load', function() {
                 // Import and setup ad refresh manager
-                import('/src/utils/adRefresh.js').then(module => {
+                import('/src/utils/adRefresh').then(module => {
                   if (module.setupAdAutoRefresh) {
                     module.setupAdAutoRefresh();
                     console.log('Ad refresh manager initialized');
