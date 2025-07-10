@@ -37,19 +37,18 @@ function getActiveAdProvider(): string {
 function generateCSPHeader(): string {
   const activeProvider = getActiveAdProvider().toUpperCase();
   
-  // For AdSense, use Google's recommended strict CSP approach
+  // For AdSense, use a balanced approach that works with Next.js
   if (activeProvider === 'ADSENSE') {
-    // Google's recommended strict CSP for AdSense
-    // Reference: https://support.google.com/adsense/answer/16283098
+    // Modified CSP that supports both AdSense and Next.js functionality
     return [
       "object-src 'none'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:",
       "style-src 'self' 'unsafe-inline' https:",
       "img-src 'self' data: blob: https:",
       "connect-src 'self' https:",
       "frame-src 'self' https:",
       "fenced-frame-src 'self' https:",
-      "base-uri 'none'",
+      "base-uri 'self'",
       "form-action 'self'"
     ].join('; ');
   }
