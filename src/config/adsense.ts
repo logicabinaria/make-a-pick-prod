@@ -3,11 +3,11 @@
 
 export const ADSENSE_CONFIG = {
   // Your Google AdSense Publisher ID (starts with ca-pub-)
-  publisherId: 'ca-pub-6150853912343151',
+  publisherId: process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || 'ca-pub-6150853912343151',
   
   // Ad Slot ID for small banner ad in footer
   adSlots: {
-    banner: '1234567890', // Replace with your actual Banner ad slot ID from AdSense
+    banner: process.env.NEXT_PUBLIC_ADSENSE_BANNER_SLOT || '1234567890', // Replace with your actual Banner ad slot ID from AdSense
   },
   
   // AdSense script URL
