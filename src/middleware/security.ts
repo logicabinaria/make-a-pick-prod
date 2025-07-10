@@ -7,7 +7,9 @@ const AD_DOMAINS = {
     'https://googleads.g.doubleclick.net',
     'https://tpc.googlesyndication.com',
     'https://www.google.com',
-    'https://www.gstatic.com'
+    'https://www.gstatic.com',
+    'https://www.googletagmanager.com',
+    'https://ep1.adtrafficquality.google'
   ],
   EZOIC: [
     'https://www.ezoic.com',
