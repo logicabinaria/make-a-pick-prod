@@ -9,7 +9,8 @@ const AD_DOMAINS = {
     'https://www.google.com',
     'https://www.gstatic.com',
     'https://www.googletagmanager.com',
-    'https://ep1.adtrafficquality.google'
+    'https://ep1.adtrafficquality.google',
+    'https://www.google-analytics.com'
   ],
   EZOIC: [
     'https://www.ezoic.com',
