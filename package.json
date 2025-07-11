@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "version:update": "node scripts/update-version.mjs",
+    "version:patch": "node scripts/update-version.mjs",
+    "version:minor": "node scripts/update-version.mjs $(node -e \"const v=require('./src/utils/versionManager.ts').CURRENT_VERSION.version.split('.'); console.log(v[0]+'.'+((+v[1])+1)+'.0')\")",
+    "version:major": "node scripts/update-version.mjs $(node -e \"const v=require('./src/utils/versionManager.ts').CURRENT_VERSION.version.split('.'); console.log(((+v[0])+1)+'.0.0')\")",
+    "deploy:prep": "npm run version:update && npm run build",
+    "deploy:build": "npm run deploy:prep"
   },
   "dependencies": {
     "@types/js-cookie": "^3.0.6",

@@ -161,6 +161,26 @@ export default function RootLayout({
             `
           }}
         />
+        
+        {/* Version Manager for Auto-Updates */}
+        <Script
+          id="version-manager-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Initialize version manager for automatic updates
+              window.addEventListener('load', function() {
+                import('/src/utils/versionManager').then(module => {
+                  if (module.versionManager) {
+                    console.log('Version manager initialized - checking for updates...');
+                  }
+                }).catch(err => {
+                  console.warn('Failed to load version manager:', err);
+                });
+              });
+            `
+          }}
+        />
       </head>
       <body className="antialiased" suppressHydrationWarning={true}>
         {children}
