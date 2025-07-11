@@ -20,8 +20,9 @@ import { fileURLToPath, pathToFileURL } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to the version manager file
+// Paths to version files
 const VERSION_FILE = path.join(__dirname, '..', 'src', 'utils', 'versionManager.ts');
+const VERSION_JSON = path.join(__dirname, '..', 'public', 'version.json');
 
 // Get version from command line or auto-increment
 function getNewVersion() {
@@ -49,28 +50,39 @@ function getNewVersion() {
   return '1.0.1';
 }
 
-// Update version in the file
+// Update version in both TypeScript and JSON files
 function updateVersion(newVersion) {
+  const buildTime = new Date().toISOString();
+  
   try {
+    // Update TypeScript file
     let content = fs.readFileSync(VERSION_FILE, 'utf8');
     
-    // Update version
     content = content.replace(
       /version: '[0-9]+\.[0-9]+\.[0-9]+'/,
       `version: '${newVersion}'`
     );
     
-    // Update build time
     content = content.replace(
       /buildTime: '[^']*'/,
-      `buildTime: '${new Date().toISOString()}'`
+      `buildTime: '${buildTime}'`
     );
     
     fs.writeFileSync(VERSION_FILE, content, 'utf8');
     
+    // Update JSON file
+    const versionData = {
+      version: newVersion,
+      buildTime: buildTime,
+      checkInterval: 30000
+    };
+    
+    fs.writeFileSync(VERSION_JSON, JSON.stringify(versionData, null, 2), 'utf8');
+    
     console.log(`✅ Version updated to ${newVersion}`);
-    console.log(`📅 Build time: ${new Date().toISOString()}`);
-    console.log(`📁 File: ${VERSION_FILE}`);
+    console.log(`📅 Build time: ${buildTime}`);
+    console.log(`📁 TypeScript: ${VERSION_FILE}`);
+    console.log(`📁 JSON: ${VERSION_JSON}`);
     
     return true;
   } catch (error) {

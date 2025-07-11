@@ -8,13 +8,13 @@ export interface VersionInfo {
 
 // Current app version - update this with each deployment
 export const CURRENT_VERSION = {
-  version: '1.0.6',
-  buildTime: '2025-07-11T12:10:24.629Z',
+  version: '1.0.8',
+  buildTime: '2025-07-11T12:19:51.083Z',
   checkInterval: 30000 // Check every 30 seconds
 };
 
-// Version check endpoint (will be created as API route)
-const VERSION_ENDPOINT = '/api/version';
+// Version check via static file (no server processing needed)
+const VERSION_ENDPOINT = '/version.json';
 
 class VersionManager {
   private checkInterval: NodeJS.Timeout | null = null;
