@@ -159,5 +159,183 @@
     "subtitle": "Help others make quick decisions too",
     "shareText": "Check out Make A Pick - a fun tool to help you make random decisions!",
     "copyLink": "Copy Link"
-  }
+  },
+  "welcomeTitle": "Welcome to Make A Pick! 🎲",
+  "welcomeSubtitle": "Your fun and interactive decision maker. Choose from popular categories or create your own custom decision!",
+  "skipToCustom": "✨ Skip to Custom",
+  "backToHome": "🏠 Back to Home",
+  "exploreCategories": "🎯 Explore Categories",
+  "customDecision": "Custom Decision",
+  "welcome": {
+    "title": "Welcome to Make A Pick! 🎲",
+    "subtitle": "Your fun and interactive decision maker",
+    "description": "Choose from popular categories or create your own custom decision. Let's make choosing fun and easy!",
+    "exploreCategories": "Explore Categories",
+    "customDecision": "Custom Decision",
+    "skipToCustom": "Skip to Custom Input"
+  },
+  "categories": {
+    "title": "Choose Your Decision Category",
+    "subtitle": "Pick a category that matches your decision",
+    "quickStart": "🚀 Quick Start",
+    "quickStartSubtitle": "Popular decision categories",
+    "seeAllCategories": "See All Categories",
+    "backToWelcome": "Back to Welcome",
+    "input": {
+      "addOptions": "Add Your Options",
+      "quickSuggestions": "💡 Quick Suggestions",
+      "decideButton": "Decide For Me!",
+      "backButton": "Back to Categories",
+      "minOptionsHint": "Add at least 2 options to make a decision"
+    },
+    "food": {
+      "name": "What to Eat",
+      "description": "Can't decide what to have for your meal?",
+      "placeholder": "e.g., Pizza, Burger, Sushi...",
+      "suggestions": {
+        "pizza": "Pizza",
+        "burger": "Burger",
+        "sushi": "Sushi",
+        "pasta": "Pasta",
+        "tacos": "Tacos",
+        "salad": "Salad",
+        "sandwich": "Sandwich",
+        "ramen": "Ramen"
+      }
+    },
+    "places": {
+      "name": "Where to Go",
+      "description": "Need help choosing your next destination?",
+      "placeholder": "e.g., Park, Mall, Beach...",
+      "suggestions": {
+        "park": "Park",
+        "mall": "Mall",
+        "beach": "Beach",
+        "museum": "Museum",
+        "cafe": "Cafe",
+        "library": "Library",
+        "gym": "Gym",
+        "cinema": "Cinema"
+      }
+    },
+    "clothing": {
+      "name": "What to Wear",
+      "description": "Struggling with your outfit choice?",
+      "placeholder": "e.g., Casual, Formal, Sporty...",
+      "suggestions": {
+        "casual": "Casual",
+        "formal": "Formal",
+        "sporty": "Sporty",
+        "elegant": "Elegant",
+        "comfortable": "Comfortable",
+        "trendy": "Trendy",
+        "classic": "Classic",
+        "bohemian": "Bohemian"
+      }
+    },
+    "entertainment": {
+      "name": "What to Watch",
+      "description": "Can't pick your next entertainment?",
+      "placeholder": "e.g., Movie, Series, Documentary...",
+      "suggestions": {
+        "movie": "Movie",
+        "tvseries": "TV Series",
+        "documentary": "Documentary",
+        "youtube": "YouTube",
+        "netflix": "Netflix"
+      }
+    },
+    "activities": {
+      "name": "What to Do",
+      "description": "Looking for your next activity?",
+      "placeholder": "e.g., Reading, Gaming, Exercise...",
+      "suggestions": {
+        "reading": "Reading",
+        "gaming": "Gaming",
+        "exercise": "Exercise",
+        "cooking": "Cooking",
+        "drawing": "Drawing",
+        "music": "Listen to Music",
+        "walking": "Walking",
+        "meditation": "Meditation"
+      }
+    },
+    "travel": {
+      "name": "Where to Travel",
+      "description": "Planning your next adventure?",
+      "placeholder": "e.g., Paris, Tokyo, New York...",
+      "suggestions": {
+        "paris": "Paris",
+        "tokyo": "Tokyo",
+        "newyork": "New York",
+        "london": "London",
+        "rome": "Rome",
+        "bali": "Bali",
+        "sydney": "Sydney",
+        "dubai": "Dubai"
+      }
+    },
+    "games": {
+      "name": "What to Play",
+      "description": "Choose a game to play",
+      "placeholder": "e.g., Video Game, Board Game, Card Game...",
+      "suggestions": {
+        "videogame": "Video Game",
+        "boardgame": "Board Game",
+        "cardgame": "Card Game",
+        "sport": "Sport",
+        "puzzle": "Puzzle"
+      }
+    },
+    "work": {
+      "name": "Work Tasks",
+      "description": "Prioritize your work tasks",
+      "placeholder": "e.g., Email, Meeting, Project...",
+      "suggestions": {
+        "email": "Email",
+        "meeting": "Meeting",
+        "project": "Project",
+        "research": "Research",
+        "planning": "Planning"
+      }
+    },
+    "creative": {
+      "name": "Creative Ideas",
+      "description": "Spark your creativity",
+      "placeholder": "e.g., Drawing, Writing, Music...",
+      "suggestions": {
+        "drawing": "Drawing",
+        "writing": "Writing",
+        "music": "Music",
+        "photography": "Photography",
+        "crafts": "Crafts"
+      }
+    },
+    "custom": {
+      "name": "Custom Decision",
+      "description": "Create your own decision",
+      "placeholder": "Enter your option...",
+      "suggestions": {}
+    }
+  },
+  "result": {
+    "title": "🎉 Your Decision Is Made!",
+    "celebration": "Perfect choice! Trust the pick and go with it!",
+    "tryAgain": "Try Again",
+    "newDecision": "New Decision",
+    "share": "📤 Share",
+    "backToCategories": "🏠 Categories",
+    "allOptions": "All Options",
+    "shareText": "I used Make A Pick to decide",
+    "copiedToClipboard": "Copied to clipboard!"
+  },
+  "backToCategories": "🏠 Back to Categories",
+  "navigation": {
+    "home": "Home",
+    "help": "Help"
+  },
+  "app": {
+    "name": "Make a Pick"
+  },
+  "removeOption": "Remove option"
 }

@@ -5,7 +5,6 @@ import { useTranslation } from '@/components/I18nProvider';
 import confetti from 'canvas-confetti';
 import { pickRandomOption } from '@/utils/clientPicker';
 import { useMobile } from '@/hooks/useMobile';
-import Image from 'next/image';
 
 // Inspiring quotes function - Disabled for now to save screen space
 // const getInspiringQuotes = (t: (key: string) => string) => [
@@ -137,21 +136,7 @@ export default function Picker() {
 
   if (result) {
     return (
-      <div className="max-w-md mx-auto space-y-8">
-        {/* Logo */}
-        <div className="text-center">
-          <div className="flex justify-center">
-            <Image
-              src="/logosvg.svg"
-              alt="Make A Pick - Random Decision Maker"
-              width={150}
-              height={80}
-              className="h-15 w-auto"
-              priority
-            />
-          </div>
-        </div>
-        
+      <div className="max-w-md mx-auto space-y-6">
         {/* Result Display */}
         <div className="text-center space-y-8">
           <div className="relative bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 text-white p-8 rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
@@ -192,20 +177,13 @@ export default function Picker() {
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-8">
-      {/* Logo and Tagline */}
-      <div className="text-center space-y-6">
-        <div className="flex justify-center">
-          <Image
-            src="/logosvg.svg"
-            alt="Make A Pick - Random Decision Maker"
-            width={150}
-            height={80}
-            className="h-15 w-auto"
-            priority
-          />
-        </div>
-        <p className="text-xl text-gray-300 font-medium">
+    <div className="max-w-md mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-3">
+        <h1 className="text-2xl font-bold text-white">
+          {t('customDecision') || 'Custom Decision'}
+        </h1>
+        <p className="text-lg text-gray-300">
           {t('tagline')}
         </p>
       </div>
